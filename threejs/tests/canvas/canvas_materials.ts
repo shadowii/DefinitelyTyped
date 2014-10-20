@@ -11,7 +11,7 @@
     var container, stats;
 
     var camera, scene, renderer, objects;
-    var particleLight, pointLight;
+    var pointLight;
 
     init();
     animate();
@@ -50,7 +50,7 @@
 
         // Spheres
 
-        var geometry = new THREE.SphereGeometry(100, 14, 7);
+        var geometry2 = new THREE.SphereGeometry(100, 14, 7);
 
         materials = [
 
@@ -66,9 +66,9 @@
 
         ];
 
-        for (var i = 0, l = geometry.faces.length; i < l; i++) {
+        for (var i = 0, l = geometry2.faces.length; i < l; i++) {
 
-            var face = geometry.faces[i];
+            var face = geometry2.faces[i];
             if (Math.random() > 0.5) face.materialIndex = Math.floor(Math.random() * materials.length);
 
         }
@@ -79,7 +79,7 @@
 
         for (var i = 0, l = materials.length; i < l; i++) {
 
-            var sphere = new THREE.Mesh(geometry, materials[i]);
+            var sphere = new THREE.Mesh(geometry2, materials[i]);
 
             sphere.position.x = (i % 5) * 200 - 400;
             sphere.position.z = Math.floor(i / 5) * 200 - 200;
@@ -103,10 +103,6 @@
 
         }
 
-				particleLight = new THREE.Sprite(new THREE.SpriteCanvasMaterial({ color: 0xffffff, program: program }));
-        particleLight.scale.x = particleLight.scale.y = 8;
-        scene.add(particleLight);
-
         // Lights
 
         scene.add(new THREE.AmbientLight(Math.random() * 0x202020));
@@ -120,6 +116,10 @@
 
         pointLight = new THREE.PointLight(0xffffff, 1);
         scene.add(pointLight);
+
+        var sprite = new THREE.Sprite( new THREE.SpriteCanvasMaterial( { color: 0xffffff, program: program } ) );
+        sprite.scale.set( 8, 8, 8 );
+        pointLight.add( sprite );
 
         renderer = new THREE.CanvasRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -198,13 +198,10 @@
 
         }
 
-        particleLight.position.x = Math.sin(timer * 7) * 300;
-        particleLight.position.y = Math.cos(timer * 5) * 400;
-        particleLight.position.z = Math.cos(timer * 3) * 300;
+        pointLight.position.x = Math.sin( timer * 7 ) * 300;
+        pointLight.position.y = Math.cos( timer * 5 ) * 400;
+        pointLight.position.z = Math.cos( timer * 3 ) * 300;
 
-        pointLight.position.x = particleLight.position.x;
-        pointLight.position.y = particleLight.position.y;
-        pointLight.position.z = particleLight.position.z;
 
         renderer.render(scene, camera);
 

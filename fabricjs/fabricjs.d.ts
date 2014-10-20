@@ -1,7 +1,7 @@
 // Type definitions for FabricJS
 // Project: http://fabricjs.com/
 // Definitions by: Oliver Klemencic <https://github.com/oklemencic/>
-// DefinitelyTyped: https://github.com/borisyankov/DefinitelyTyped
+// Definitions: https://github.com/borisyankov/DefinitelyTyped
 
 declare module fabric {
 
@@ -324,7 +324,7 @@ declare module fabric {
         setWidth(value: number): IObject;
 
         // methods
-        bringForward(): IObject;
+        bringForward(intersecting?: boolean): IObject;
         bringToFront(): IObject;
         center(): IObject;
         centerH(): IObject;
@@ -335,6 +335,7 @@ declare module fabric {
         drawBorders(context: CanvasRenderingContext2D): IObject;
         drawCorners(context: CanvasRenderingContext2D): IObject;
         get (property: string): any;
+        getBoundingRect(): {left:number; top:number; width:number; height:number};
         getBoundingRectHeight(): number;
         getBoundingRectWidth(): number;
         getSvgStyles(): string;
@@ -354,7 +355,7 @@ declare module fabric {
         scale(value: number): IObject;
         scaleToHeight(value: number): IObject;
         scaleToWidth(value: number): IObject;
-        sendBackwards(): IObject;
+        sendBackwards(intersecting?: boolean): IObject;
         sendToBack(): IObject;
 
         set (properties: IObjectOptions): IObject;
@@ -606,6 +607,21 @@ declare module fabric {
         loadFromDatalessJSON(json, callback: () => void): void;
     }
 
+    export interface IPattern {
+        (options: IPatternOptions): IPattern;
+
+        initialise(options: IPatternOptions): IPattern;
+
+        toLive(ctx: CanvasRenderingContext2D): IPattern;
+        toObject(): any;
+        toSVG(): string;
+
+        offsetX: number;
+        offsetY: number;
+        repeat: string;
+        source: any;
+    }
+
     export interface IBrightnessFilter {
     }
     export interface IInvertFilter {
@@ -657,6 +673,13 @@ declare module fabric {
         stateful?: boolean;
     }
 
+    export interface IPatternOptions {
+        source: any;
+        offsetX: number;
+        offsetY: number;
+        repeat: string;
+    }
+
     export interface IRectOptions extends IObjectOptions {
         x?: number; 
         y?: number;
@@ -693,6 +716,12 @@ declare module fabric {
 
         EMPTY_JSON: string;
         supports(methodName: string): boolean;
+        prototype: any;
+    }
+
+    var Pattern: {
+        new (options: IPatternOptions): IPattern;
+
         prototype: any;
     }
 

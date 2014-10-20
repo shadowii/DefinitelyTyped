@@ -1,7 +1,9 @@
-// Type definitions for Chrome extension development.
+// Type definitions for Chrome extension development
 // Project: http://developer.chrome.com/extensions/
-// Definitions by: Matthew Kimber <https://github.com/matthewkimber> and otiai10 <https://github.com/otiai10>
+// Definitions by: Matthew Kimber <https://github.com/matthewkimber>, otiai10 <https://github.com/otiai10>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
+
+/// <reference path='../webrtc/MediaStream.d.ts'/>
 
 ////////////////////
 // Alarms
@@ -294,6 +296,7 @@ declare module chrome.contextMenus {
         pageUrl: string;
         linkUrl?: string;
         parentMenuItemId?: any;
+        srcUrl?: string;
     }
 
     interface CreateProperties {
@@ -535,6 +538,14 @@ declare module chrome.declarativeWebRequest {
     }    
 
     var onRequest: RequestedEvent;
+}
+
+////////////////////
+// DesktopCapture
+////////////////////
+declare module chrome.desktopCapture {
+    export function chooseDesktopMedia(sources: string[], targetTab?: chrome.tabs.Tab, callback?: (streamId: string) => void): void;
+    export function cancelChooseDesktopMedia(desktopMediaRequestId: number): void;
 }
 
 ////////////////////
@@ -843,8 +854,12 @@ declare module chrome.extension {
         type?: string;
     }
 
+    interface LastError {
+        message?: string;
+    }
+
     var inIncognitoContext: boolean;
-    var lastError: Object;
+    var lastError: LastError;
 
     export function getBackgroundPage(): Window;
     export function getURL(path: string): string;
@@ -1038,6 +1053,7 @@ declare module chrome.identity {
 declare module chrome.i18n {
     export function getMessage(messageName: string, substitutions?: any): string;
     export function getAcceptLanguages(callback: (languages: string[]) => void): void;
+    export function getUILanguage(): string;
 }
 
 ////////////////////
@@ -1233,6 +1249,68 @@ declare module chrome.management {
 }
 
 ////////////////////
+// Notifications
+// https://developer.chrome.com/extensions/notifications
+////////////////////
+declare module chrome.notifications {
+    interface ButtonOptions {
+        title: string;
+        iconUrl?: string;
+    }
+
+    interface ItemOptions {
+        title: string;
+        message: string;
+    }
+
+    interface NotificationOptions {
+        type?: string;
+        iconUrl?: string;
+        title?: string;
+        message?: string;
+        contextMessage?: string;
+        priority?: number;
+        eventTime?: number;
+        buttons?: Array<ButtonOptions>;
+        items?: Array<ItemOptions>;
+        progress?: number;
+        isClickable?: boolean;
+    }
+
+    interface OnClosed {
+        addListener(callback: (notificationId: string, byUser: boolean) => void): void;
+    }
+
+    interface OnClicked {
+        addListener(callback: (notificationId: string) => void): void;
+    }
+
+    interface OnButtonClicked {
+        addListener(callback: (notificationId: string, buttonIndex: number) => void): void;
+    }
+
+    interface OnPermissionLevelChanged {
+        addListener(callback: (level: string) => void): void;
+    }
+
+    interface OnShowSettings {
+        addListener(callback: Function): void;
+    }
+
+    export var onClosed: OnClosed;
+    export var onClicked: OnClicked;
+    export var onButtonClicked: OnButtonClicked;
+    export var onPermissionLevelChanged: OnPermissionLevelChanged;
+    export var onShowSettings: OnShowSettings;
+
+    export function create(notificationId: string, options: NotificationOptions, callback: (notificationId: string) => void): void;
+    export function update(notificationId: string, options: NotificationOptions, callback: (wasUpdated: boolean) => void): void;
+    export function clear(notificationId: string, callback: (wasCleared: boolean) => void): void;
+    export function getAll(callback: (notifications: any) => void): void;
+    export function getPermissionLevel(callback: (level: string) => void): void;
+}
+
+////////////////////
 // Omnibox
 ////////////////////
 declare module chrome.omnibox {
@@ -1425,8 +1503,12 @@ declare module chrome.proxy {
 // Runtime
 ////////////////////
 declare module chrome.runtime {
-    var lastError: Object;
+    var lastError: LastError;
     var id: string;
+
+    interface LastError {
+        message?: string;
+    }
 
     interface ConnectInfo {
         name?: string;
@@ -1535,8 +1617,8 @@ declare module chrome.runtime {
     var onStartup: RuntimeStartupEvent;
     var onInstalled: RuntimeInstalledEvent;
     var onSuspendCanceled: RuntimeSuspendCanceledEvent;
-    var onMessage: RuntimeMessageEvent;
-    var onMessageExternal: RuntimeMessageEvent;
+    var onMessage: ExtensionMessageEvent;
+    var onMessageExternal: ExtensionMessageExternalEvent;
     var onRestartRequired: RuntimeRestartRequiredEvent;
     var onUpdateAvailable: RuntimeUpdateAvailableEvent;
 
@@ -1673,6 +1755,27 @@ declare module chrome.socket {
     export function setNoDelay(socketId: number, noDelay: boolean, callback?: (result: boolean) => void): void;
     export function getInfo(socketId: number, callback: (result: SocketInfo) => void): void;
     export function getNetworkList(callback: (result: NetworkInterface[]) => void): void;
+}
+
+////////////////////
+// TabCapture
+////////////////////
+declare module chrome.tabCapture {
+    interface CaptureInfo {
+        tabId: number;
+        status: string;
+        fullscreen: boolean;
+    }
+
+    interface CaptureOptions {
+        audio?: boolean;
+        video?: boolean;
+        audioConstraints?: MediaTrackConstraints;
+        videoConstraints?: MediaTrackConstraints;
+    }
+
+    export function capture(options: CaptureOptions, callback: (stream: LocalMediaStream) => void): void;
+    export function getCapturedTabs(callback: (result: CaptureInfo[]) => void): void;
 }
 
 ////////////////////
@@ -2128,13 +2231,19 @@ declare module chrome.webRequest {
         username: string;
         password: string;
     }
-
+    
+    interface HttpHeader {
+        name: string;
+        value?: string;
+        binaryValue?: ArrayBuffer;
+    }
+    
     interface BlockingResponse {
         cancel?: boolean;
         redirectUrl?: string;
-        responseHeaders?: Object;
+        responseHeaders?: HttpHeader[];
         authCredentials?: AuthCredentials;
-        requestHeaders?: Object;
+        requestHeaders?: HttpHeader[];
     }
 
     interface RequestFilter {
@@ -2154,7 +2263,7 @@ declare module chrome.webRequest {
         ip?: string;
         statusLine?: string;
         frameId: number;
-        responseHeaders?: Object;
+        responseHeaders?: HttpHeader[];
         parentFrameId: number;
         fromCache: boolean;
         url: string;
@@ -2173,7 +2282,7 @@ declare module chrome.webRequest {
         statusLine?: string;
         frameId: number;
         requestId: string;
-        responseHeaders: Object;
+        responseHeaders?: HttpHeader[];
         type: string;
         method: string;
     }
@@ -2183,7 +2292,7 @@ declare module chrome.webRequest {
         ip?: string;
         statusLine?: string;
         frameId: number;
-        responseHeaders?: Object;
+        responseHeaders?: HttpHeader[];
         parentFrameId: number;
         fromCache: boolean;
         url: string;
@@ -2205,7 +2314,7 @@ declare module chrome.webRequest {
         statusLine?: string;
         frameId: number;
         challenger: Challenger;
-        responseHeaders: Object;
+        responseHeaders?: HttpHeader[];
         isProxy: boolean;
         realm?: string;
         parentFrameId: number;
@@ -2224,7 +2333,7 @@ declare module chrome.webRequest {
         timeStamp: number;
         frameId: number;
         requestId: number;
-        requestHeaders?: Object;
+        requestHeaders?: HttpHeader[];
         type: string;
         method: string;
     }
@@ -2248,7 +2357,7 @@ declare module chrome.webRequest {
         ip?: string;
         statusLine?: string;
         frameId: number;
-        responseHeaders?: Object;
+        responseHeaders?: HttpHeader[];
         parentFrameId: number;
         fromCache: boolean;
         url: string;
@@ -2266,7 +2375,7 @@ declare module chrome.webRequest {
         timeStamp: number;
         frameId: number;
         requestId: string;
-        requestHeaders: Object;
+        requestHeaders?: HttpHeader[];
         type: string;
         method: string;
     }
@@ -2287,15 +2396,15 @@ declare module chrome.webRequest {
     }
 
     interface WebRequestCompletedEvent extends chrome.events.Event { 
-        addListener(callback: (details: OnCompletedDetails) => void, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
+        addListener(callback: (details: OnCompletedDetails) => BlockingResponse, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
     }
 
     interface WebRequestHeadersReceivedEvent extends chrome.events.Event { 
-        addListener(callback: (details: OnHeadersReceivedDetails) => void, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
+        addListener(callback: (details: OnHeadersReceivedDetails) => BlockingResponse, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
     }
 
     interface WebRequestBeforeRedirectEvent extends chrome.events.Event { 
-        addListener(callback: (details: OnBeforeRedirectDetails) => void, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
+        addListener(callback: (details: OnBeforeRedirectDetails) => BlockingResponse, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
     }
 
     interface WebRequestAuthRequiredEvent extends chrome.events.Event { 
@@ -2303,23 +2412,23 @@ declare module chrome.webRequest {
     }
 
     interface WebRequestBeforeSendHeadersEvent extends chrome.events.Event { 
-        addListener(callback: (details: OnBeforeSendHeadersDetails) => void, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
+        addListener(callback: (details: OnBeforeSendHeadersDetails) => BlockingResponse, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
     }
 
     interface WebRequestErrorOccurredEvent extends chrome.events.Event { 
-        addListener(callback: (details: OnErrorOccurredDetails) => void, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
+        addListener(callback: (details: OnErrorOccurredDetails) => BlockingResponse, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
     }
 
     interface WebRequestResponseStartedEvent extends chrome.events.Event { 
-        addListener(callback: (details: OnResponseStartedDetails) => void, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
+        addListener(callback: (details: OnResponseStartedDetails) => BlockingResponse, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
     }
 
     interface WebRequestSendHeadersEvent extends chrome.events.Event { 
-        addListener(callback: (details: OnSendHeadersDetails) => void, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
+        addListener(callback: (details: OnSendHeadersDetails) => BlockingResponse, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
     }
 
     interface WebRequestBeforeRequestEvent extends chrome.events.Event { 
-        addListener(callback: (details: OnBeforeRequestDetails) => void, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
+        addListener(callback: (details: OnBeforeRequestDetails) => BlockingResponse, filter?: RequestFilter, opt_extraInfoSpec?: string[]): void;
     }
 
     var MAX_HANDLER_BEHAVIOR_CHANGED_CALLS_PER_10_MINUTES: number;

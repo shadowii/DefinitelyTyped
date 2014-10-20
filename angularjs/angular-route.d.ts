@@ -1,6 +1,6 @@
 // Type definitions for Angular JS 1.2 (ngRoute module)
 // Project: http://angularjs.org
-// Definitions by: Jonathan Park
+// Definitions by: Jonathan Park <https://github.com/park9140>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
 /// <reference path="angular.d.ts" />
@@ -15,7 +15,9 @@ declare module ng.route {
     // RouteParamsService
     // see http://docs.angularjs.org/api/ngRoute.$routeParams
     ///////////////////////////////////////////////////////////////////////////
-    interface IRouteParamsService {}
+    interface IRouteParamsService {
+        [key: string]: any;
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     // RouteService
@@ -73,7 +75,7 @@ declare module ng.route {
          * - key - {string}: a name of a dependency to be injected into the controller.
          * - factory - {string|function}: If string then it is an alias for a service. Otherwise if function, then it is injected and the return value is treated as the dependency. If the result is a promise, it is resolved before its value is injected into the controller. Be aware that ngRoute.$routeParams will still refer to the previous route within these resolve functions. Use $route.current.params to access the new route parameters, instead.
          */
-        resolve?: any;
+	 resolve?: {[key: string]: any};
         /**
          * {(string|function())=}
          * Value to update $location path with and trigger route redirection.

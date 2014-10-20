@@ -1,6 +1,6 @@
 // Type definitions for Modernizr 2.6.2
 // Project: http://modernizr.com/
-// Definitions by: Boris Yankov <https://github.com/borisyankov/> and Theodore Brown <https://github.com/theodorejb/>
+// Definitions by: Boris Yankov <https://github.com/borisyankov/>, Theodore Brown <https://github.com/theodorejb/>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
 
@@ -75,7 +75,7 @@ interface ModernizrStatic {
     history: boolean;
     audio: Audioboolean;
     video: Videoboolean;
-    indexeddb: boolean;
+    indexedDB: boolean;
     input: Inputboolean;
     inputtypes: InputTypesboolean;
     localstorage: boolean;
