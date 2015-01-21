@@ -103,6 +103,7 @@ declare module Hapi {
 
 	export class Pack {
 		require(name: string, options: {}, callback: Function): void;
+		register(plugins: any, options?: Object, callback?: Function, state?: Object): void;
 	}
 
 	export interface ServerView {
@@ -278,7 +279,7 @@ declare module Hapi {
 
 	export class Server {
 		app: any;
-		methods: Array<() => void>;
+		methods: any;
 		info: {
 			port: number;
 			host?: string;
@@ -305,6 +306,7 @@ declare module Hapi {
 		log(tags: Array<string>, data?: string, timestamp?: number): void;
 		log(tags: string, data?: any, timestamp?: number): void;
 		log(tags: Array<string>, data?: any, timestamp?: number): void;
+		connection(options?: ServerOptions): void;
 		state(name: string, options?: {
 			ttl: number;
 			isSecure: boolean;
@@ -335,7 +337,7 @@ declare module Hapi {
 		};
 		ext(event: any, method: string, options?: any): void;
 		method(method: Array<{name: string; fn: () => void; options: any}>): void;
-		method(name: string, fn: () => void, options: any): void;
+		method(name: string, fn: Function, options: any): void;
 		inject(options: any, callback: any): void;
 		handler(name: string, method: (name: string, options: any) => void): void;
 	}

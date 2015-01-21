@@ -33,6 +33,34 @@ function testApiMethods(api: Pickadate.Api) {
     pickerRootElement.show();
 }
 
+function testDateApiMethods(api: Pickadate.DateApi) {
+    api.get('select');
+    api.get('select', 'yyyy/mm/dd');
+    api.get('highlight');
+    api.get('highlight', 'yyyy/mm/dd');
+    api.get('view');
+    api.get('view', 'yyyy/mm/dd');
+    api.get('min');
+    api.get('min', 'yyyy/mm/dd');
+    api.get('max');
+    api.get('max', 'yyyy/mm/dd');
+}
+
+function testTimeApiMethods(api: Pickadate.TimeApi) {
+    api.get('select');
+    api.get('select', 'hh:i');
+    api.get('highlight');
+    api.get('highlight', 'hh:i');
+    api.get('view');
+    api.get('view', 'hh:i');
+    api.get('min');
+    api.get('min', 'hh:i');
+    api.get('max');
+    api.get('max', 'hh:i');
+}
+
+// ====================================================================================================================
+
 var datePickerInput = $("input.date");
 
 datePickerInput.pickadate();
@@ -150,12 +178,16 @@ datePickerInput.pickadate({
     }
 });
 
-var datePickerApi = <Pickadate.Api> datePickerInput.pickadate('picker');
+var datePickerApi = datePickerInput.pickadate('picker');
 
 datePickerInput.pickadate('open');
 datePickerInput.pickadate('get', 'value');
+datePickerInput.pickadate('$node').show();
+datePickerInput.pickadate('$root').show();
+datePickerInput.pickadate('_hidden').show();
 
 testApiMethods(datePickerApi);
+testDateApiMethods(datePickerApi);
 
 // ====================================================================================================================
 
@@ -234,10 +266,14 @@ timePickerInput.pickatime({
     }
 });
 
-var timePickerApi = <Pickadate.Api> timePickerInput.pickatime('picker');
+var timePickerApi = timePickerInput.pickatime('picker');
 
 timePickerInput.pickatime('open');
 timePickerInput.pickatime('get', 'value');
+timePickerInput.pickatime('$node').show();
+timePickerInput.pickatime('$root').show();
+timePickerInput.pickatime('_hidden').show();
 
 testApiMethods(timePickerApi);
+testTimeApiMethods(timePickerApi);
 

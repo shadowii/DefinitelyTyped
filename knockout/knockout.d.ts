@@ -1,6 +1,6 @@
 // Type definitions for Knockout v3.2.0-beta
 // Project: http://knockoutjs.com
-// Definitions by: Boris Yankov <https://github.com/borisyankov/>, Igor Oleinikov <https://github.com/Igorbek/>
+// Definitions by: Boris Yankov <https://github.com/borisyankov/>, Igor Oleinikov <https://github.com/Igorbek/>, Clément Bourgeois <https://github.com/moonpyk/>
 // Definitions: https://github.com/borisyankov/DefinitelyTyped
 
 
@@ -38,6 +38,7 @@ interface KnockoutObservableArrayFunctions<T> {
     removeAll(): T[];
 
     destroy(item: T): void;
+    destroy(destroyFunction: (item: T) => boolean): void;
     destroyAll(items: T[]): void;
     destroyAll(): void;
 }
@@ -134,6 +135,7 @@ interface KnockoutBindingHandler {
     init? (element: any, valueAccessor: () => any, allBindingsAccessor: KnockoutAllBindingsAccessor, viewModel: any, bindingContext: KnockoutBindingContext): void;
     update? (element: any, valueAccessor: () => any, allBindingsAccessor: KnockoutAllBindingsAccessor, viewModel: any, bindingContext: KnockoutBindingContext): void;
     options?: any;
+    preprocess?: (value: string, name: string, addBindingCallback?: (name: string, value: string) => void) => string;
 }
 
 interface KnockoutBindingHandlers {
@@ -304,7 +306,7 @@ interface KnockoutUtils {
 
     triggerEvent(element: any, eventType: any): void;
 
-    unwrapObservable<T>(value: KnockoutObservable<T>): T;
+    unwrapObservable<T>(value: KnockoutObservable<T> | T): T;
 
     peekObservable<T>(value: KnockoutObservable<T>): T;
 
@@ -411,13 +413,13 @@ interface KnockoutStatic {
     virtualElements: KnockoutVirtualElements;
     extenders: KnockoutExtenders;
 
-    applyBindings(viewModel: any, rootNode?: any): void;
-	applyBindingsToDescendants(viewModel: any, rootNode: any): void;
+    applyBindings(viewModelOrBindingContext?: any, rootNode?: any): void;
+	applyBindingsToDescendants(viewModelOrBindingContext: any, rootNode: any): void;
 	applyBindingAccessorsToNode(node: Node, bindings: (bindingContext: KnockoutBindingContext, node: Node) => {}, bindingContext: KnockoutBindingContext): void;
 	applyBindingAccessorsToNode(node: Node, bindings: {}, bindingContext: KnockoutBindingContext): void;
 	applyBindingAccessorsToNode(node: Node, bindings: (bindingContext: KnockoutBindingContext, node: Node) => {}, viewModel: any): void;
 	applyBindingAccessorsToNode(node: Node, bindings: {}, viewModel: any): void;
-    applyBindingsToNode(node: Element, options: any, viewModel: any): void;
+    applyBindingsToNode(node: Node, bindings: any, viewModelOrBindingContext?: any): any;
 
     subscribable: KnockoutSubscribableStatic;
     observable: KnockoutObservableStatic;
@@ -440,7 +442,7 @@ interface KnockoutStatic {
     cleanNode(node: Element): Element;
     renderTemplate(template: Function, viewModel: any, options?: any, target?: any, renderMode?: any): any;
     renderTemplate(template: string, viewModel: any, options?: any, target?: any, renderMode?: any): any;
-	unwrap(value: any): any;
+	unwrap<T>(value: KnockoutObservable<T> | T): T;
 
 	computedContext: KnockoutComputedContext;
 
@@ -562,6 +564,7 @@ interface KnockoutComponents {
     register(componentName: string, config: KnockoutComponentRegisterFnViewModel): void;
     register(componentName: string, config: KnockoutComponentRegisterStringTemplateFnViewModel): void;
     register(componentName: string, config: KnockoutComponentRegisterAMD): void;
+    register(componentName: string, config: {}): void;
 
 	isRegistered(componentName: string): boolean;
 	unregister(componentName: string): void;
